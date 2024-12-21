@@ -79,13 +79,33 @@ def proses_gambar():
         parameter_proses = parameter_proses + 1
 
         # Meningkatkan Kontras Gambar
-        main_image = tingkatkan_kontras_rgb()
+        main_image = filter_bilateral()
 
         # Mengupdate label untuk menampilkan gambar grayscale
         label_preview.config(image=main_image)
         label_preview.image = main_image
         label_status.config(text="Gambar berhasil ditingkatkan kontrasnya!")
     elif parameter_proses == 1:
+        parameter_proses = parameter_proses + 1
+
+        # Meningkatkan Ketajaman Gambar
+        main_image = tingkatkan_kontras_rgb()
+
+        # Mengupdate label untuk menampilkan gambar grayscale
+        label_preview.config(image=main_image)
+        label_preview.image = main_image
+        label_status.config(text="Gambar berhasil ditingkatkan ketajamannya!")    
+    elif parameter_proses == 2:
+        parameter_proses = parameter_proses + 1
+
+        # Meningkatkan Ketajaman Gambar
+        main_image = tingkatkan_ketajaman_laplacian()
+
+        # Mengupdate label untuk menampilkan gambar grayscale
+        label_preview.config(image=main_image)
+        label_preview.image = main_image
+        label_status.config(text="Gambar berhasil ditingkatkan ketajamannya!")    
+    elif parameter_proses == 3:
         parameter_proses = parameter_proses + 1
 
         # Ambil Path Hasil Pengolahan Terakhir
@@ -103,6 +123,22 @@ def proses_gambar():
         label_status.config(text="Gambar berhasil diprediksi!")
     else:
         label_status.config(text="Proses Selesai, Silahkan Pilih Gambar Lain!")
+
+def filter_bilateral():
+    global main_np
+    
+    # Terapkan bilateral filter dengan diameter 9, sigmaColor 75, dan sigmaSpace 75
+    # Diameter lebih besar berarti area pemrosesan lebih besar, sigmaColor dan sigmaSpace mempengaruhi seberapa halus gambar
+    filtered_image = cv2.bilateralFilter(main_np, 3, 30, 30)  # Ukuran diameter, sigmaColor, sigmaSpace bisa disesuaikan
+    
+    # Update gambar
+    main_np = filtered_image
+    
+    # Convert ke PIL untuk preview di Tkinter
+    pil_image = Image.fromarray(filtered_image)
+    tk_image = ImageTk.PhotoImage(pil_image)
+    
+    return tk_image
 
 def tingkatkan_kontras_rgb():
     global main_np
@@ -123,6 +159,27 @@ def tingkatkan_kontras_rgb():
     
     # Convert ke PIL untuk preview di Tkinter
     pil_image = Image.fromarray(enhanced_img)
+    tk_image = ImageTk.PhotoImage(pil_image)
+    
+    return tk_image
+
+def tingkatkan_ketajaman_laplacian():
+    global main_np
+    
+    # Terapkan filter Laplacian untuk mendeteksi tepi
+    laplacian = cv2.Laplacian(main_np, cv2.CV_64F)
+    
+    # Konversi kembali ke tipe uint8 setelah Laplacian
+    laplacian = cv2.convertScaleAbs(laplacian)
+    
+    # Menambahkan gambar asli dan gambar Laplacian untuk meningkatkan ketajaman
+    sharpened_image = cv2.addWeighted(main_np, 1.0, laplacian, -0.3, 0)  # Mengurangi sedikit efek sharpen
+    
+    # Update gambar
+    main_np = sharpened_image
+    
+    # Convert ke PIL untuk preview di Tkinter
+    pil_image = Image.fromarray(sharpened_image)
     tk_image = ImageTk.PhotoImage(pil_image)
     
     return tk_image
