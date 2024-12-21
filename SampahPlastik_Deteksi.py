@@ -20,9 +20,9 @@ parameter_proses = -1
 
 # Variabel dengan nilai di dalamnya
 # ==== UBAH SESUAI DENGAN LOKASI FILE ANDA ====
-hasil_pengolahan_path = r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\hasil_pengolahan\gambar_hasil.jpg"
-hasil_prediksi_path = r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\runs\detect\predict"
-model_yolo_path = r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\train\weights\best.pt"
+hasil_pengolahan_path = r"C:\Users\aryaa\Documents\Arya\Kuliah\Pengolahan Citra Digital\Tugas Kelompok\UAS\yang di github\pcd-litter-detection\hasil_pengolahan\gambar_hasil.jpg"
+hasil_prediksi_path = r"C:\Users\aryaa\Documents\Arya\Kuliah\Pengolahan Citra Digital\Tugas Kelompok\UAS\yang di github\pcd-litter-detection\runs\detect\predict"
+model_yolo_path = r"C:\Users\aryaa\Documents\Arya\Kuliah\Pengolahan Citra Digital\Tugas Kelompok\UAS\yang di github\pcd-litter-detection\train\weights\best.pt"
 
 def pilih_gambar():
     global selected_path, resized_image, main_image, new_width, new_height, parameter_proses, main_np  # Gunakan variabel global untuk menyimpan gambar dan ukuran
@@ -106,23 +106,22 @@ def proses_gambar():
 
 def tingkatkan_kontras_rgb():
     global main_np
-    # Mengonversi gambar dari BGR (OpenCV default) ke RGB
-    img_rgb = cv2.cvtColor(main_np, cv2.COLOR_BGR2RGB)
+    # Pisahkan saluran warna BGR
+    b, g, r = cv2.split(main_np)
     
-    # Pisahkan saluran warna
-    r, g, b = cv2.split(img_rgb)
+    # Buat objek CLAHE
+    clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(16, 16))
     
-    # Terapkan CLAHE pada setiap saluran
-    clahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(5, 5))
-    r_clahe = clahe.apply(r)
-    g_clahe = clahe.apply(g)
-    b_clahe = clahe.apply(b)
+    # Terapkan CLAHE pada setiap saluran secara terpisah
+    b_clahe = clahe.apply(b)  # Terapkan CLAHE pada saluran Biru
+    g_clahe = clahe.apply(g)  # Terapkan CLAHE pada saluran Hijau
+    r_clahe = clahe.apply(r)  # Terapkan CLAHE pada saluran Merah
     
-    # Gabungkan saluran kembali menjadi gambar berwarna
-    enhanced_img = cv2.merge([r_clahe, g_clahe, b_clahe])
-    main_np = enhanced_img
+    # Gabungkan kembali saluran menjadi gambar BGR
+    enhanced_img = cv2.merge([b_clahe, g_clahe, r_clahe])
+    main_np = enhanced_img  # Update gambar dengan hasil CLAHE
     
-    # Convert to PIL untuk preview
+    # Convert ke PIL untuk preview di Tkinter
     pil_image = Image.fromarray(enhanced_img)
     tk_image = ImageTk.PhotoImage(pil_image)
     
