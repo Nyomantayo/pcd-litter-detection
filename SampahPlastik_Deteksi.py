@@ -9,7 +9,6 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 
 # Variabel untuk menyimpan gambar yang dipilih dan ukuran gambar yang diubah
-hasil_pengolahan_path = None
 temp_file_path = None
 selected_path = None
 resized_image = None
@@ -18,6 +17,12 @@ main_np = None
 new_width = None
 new_height = None
 parameter_proses = -1
+
+# Variabel dengan nilai di dalamnya
+# ==== UBAH SESUAI DENGAN LOKASI FILE ANDA ====
+hasil_pengolahan_path = r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\hasil_pengolahan\gambar_hasil.jpg"
+hasil_prediksi_path = r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\runs\detect\predict"
+model_yolo_path = r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\train\weights\best.pt"
 
 def pilih_gambar():
     global selected_path, resized_image, main_image, new_width, new_height, parameter_proses, main_np  # Gunakan variabel global untuk menyimpan gambar dan ukuran
@@ -125,7 +130,7 @@ def tingkatkan_kontras_rgb():
 
 def prediksi_gambar():
     # Ambil Path Folder untuk menyimpan hasil prediksi
-    folder_path = r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\runs\detect\predict"
+    folder_path = hasil_prediksi_path
 
     # Memeriksa apakah path folder ada
     if os.path.exists(folder_path):
@@ -136,14 +141,14 @@ def prediksi_gambar():
         print(f"Folder {folder_path} tidak ditemukan. (Aman untuk disimpan)")
     
     # Mengambil Model YOLO
-    model = YOLO(r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\train\weights\best.pt")
+    model = YOLO(model_yolo_path)
 
     # Deteksikan gambar
     model.predict(hasil_pengolahan_path, save=True, conf=0.5)
 
 def ambil_gambar_prediksi():
     # Buka File Gambar
-    file_path_predicted = r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\runs\detect\predict"
+    file_path_predicted = hasil_prediksi_path
 
     # Mengambil seluruh file dalam folder dan subfolder
     jpg_files = [file for file in os.listdir(file_path_predicted) if file.endswith(".jpg")]
@@ -166,10 +171,7 @@ def simpan_gambar_np():
     global main_np, hasil_pengolahan_path
     img_bgr = None
     # Tentukan path penyimpanan
-    save_path = r"C:\Tugas Sekolah dan Kuliah\Universitas Udayana\SEMESTER 3\Pengolahan Citra Digital\Tugas Akhir\persiapan_uas\hasil_pengolahan\gambar_hasil.jpg"
-
-    # Mengambil Path Hasil Pengolahan
-    hasil_pengolahan_path = save_path
+    save_path = hasil_pengolahan_path
 
     # Memeriksa apakah path file ada
     if os.path.exists(save_path):
